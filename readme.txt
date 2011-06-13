@@ -14,6 +14,8 @@ On display, duplicate whitespace (including unicode whitespace characters) in be
 
 This enables consistency in a blog with multiple contributors where one writer uses double spaces between sentences and another uses single spaces.
 
+No modifications are made to the post content itself, the replacement happens when the content is displayed to the user.
+
 == Installation ==
 
 1. Unzip `remove-double-space.zip`.

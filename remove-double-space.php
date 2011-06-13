@@ -39,7 +39,6 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 
 	class JJERemoveDoubleSpace {
 
-		// Set defaults to false for all options
 		var $hook           = 'jje-remove-double-space';
 		var $filename	    = 'remove-double-space/remove-double-space.php';
 		var $longname	    = 'Remove Double Space Options';
@@ -94,11 +93,12 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		 * @return none
 		 */
 		function jje_rds_menu() {
+			// Add a sub-menu to the 'Settings' menu
 			add_options_page( $this->longname, $this->shortname, 'manage_options', $this->hook, array(&$this, 'plugin_options_create_page') );
 		}
 		
 		function plugin_admin_init() {
-			// Initialize plugin options
+			// Register and configure plugin group, sections and fields
 			register_setting( 'jje_rds_options_group', $this->optionname, array(&$this, 'plugin_options_validate') );
 			add_settings_section('jje_rds_plugin_main', '', array(&$this, 'plugin_settings_section'), $this->hook);
 			add_settings_field('remove_all_duplicates', 'Remove all duplicates', array(&$this, 'plugin_setting_rad'), $this->hook, 'jje_rds_plugin_main');
@@ -151,10 +151,10 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		}
 		
 		function plugin_options_validate( $input ) {
-			// merge input array with options saved in the db
+			// Merge input array with options saved in the db
 			$options = wp_parse_args($input, get_option( $this->optionname ) );
 
-			// check if remove_all_duplicates is set, then set to boolean value
+			// Check if remove_all_duplicates is set, then set to boolean value
 			if (isset($input['remove_all_duplicates']) && $input['remove_all_duplicates'] == '1' ) {
 				$options['remove_all_duplicates'] = true;
 			} else {
@@ -193,13 +193,12 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		function jje_replace_double_space( $text ) {
 			$options = get_option( $this->optionname );
 			$sanitized_text = $text;
-			error_log('Entering RDS...');
+			
 			// Check if the text is UTF-8
 			// Had a lot of issues trying to match unicode whitespace
 			// See resolution here: http://stackoverflow.com/questions/3137296/matching-duplicate-whitespace-with-preg-replace
 			if ( seems_utf8( $text ) ) {
 				if ( isset( $options['remove_all_duplicates'] ) && $options['remove_all_duplicates'] ) {
-					error_log('Removing spaces from text...');
 					$sanitized_text = preg_replace( '/[\p{Z}\s]{2,}/u', ' ', $text );
 				}
 			} else {
@@ -207,7 +206,6 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 					$sanitized_text = preg_replace( '/\s\s+/', ' ', $sanitized_text );
 				}
 			}
-			error_log('Leaving RDS...');
 			return $sanitized_text;
 		} // end jje_replace_double_space()
 
@@ -215,8 +213,5 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 	
 	// Instantiate RDS class
 	$jje_remove_double_space = new JJERemoveDoubleSpace();
-} else { // if !class_exists
-error_log('Class not loaded!!');
-}
-
+} // if !class_exists
 ?>
