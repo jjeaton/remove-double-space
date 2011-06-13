@@ -19,7 +19,7 @@ This enables consistency in a blog with multiple contributors where one writer u
 1. Unzip `remove-double-space.zip`.
 1. Upload the `remove-double-space` directory to the `/wp-content/plugins/` directory.
 1. Activate the plugin through the 'Plugins' menu in WordPress.
-1. Navigate to the admin panel `Posts > Remove Double Space` to turn the replacement on/off (off by default).
+1. Navigate to the admin panel `Settings > Remove Spaces` to turn the replacement on/off (off by default).
 
 == Frequently Asked Questions ==
 
@@ -30,10 +30,10 @@ Yes, if deleted via the admin interface, the plugin will remove its options from
 == Changelog ==
 
 = 0.2 =
-* Uses Settings API
-* Changed menu name and moved to Settings panel
+* Fully uses Settings API
+* Changed menu name and moved to Settings panel, added link to settings from plugins page
 * Encapsulated plugin in a class
-* Fixed donation link...oops
+* Fixed donation link
 
 = 0.1 =
 * Initial release, supports switching replacement off/on globally.

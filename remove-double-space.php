@@ -35,7 +35,7 @@ License: GPL2
  * @return none
  */
  
-if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( 'JJERemoveDoubleSpace' ) ) {
+if (!class_exists( 'JJERemoveDoubleSpace' )) {
 
 	class JJERemoveDoubleSpace {
 
@@ -63,6 +63,7 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 			register_activation_hook( __FILE__, array(&$this,'jje_install_rds') );
 			add_action( 'admin_menu', array(&$this, 'jje_rds_menu') );
 			add_action( 'admin_init', array(&$this, 'plugin_admin_init') );
+			add_filter( 'plugin_action_links', array(&$this, 'add_settings_link'), 10, 2 );
 			add_filter( 'the_content', array(&$this, 'jje_replace_double_space') ); // Run replacement everywhere 'the_content' is called (posts/feeds/etc.)
 		}
 		
@@ -76,9 +77,11 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 		 * @return none
 		 */
 		function jje_install_rds() {
-			error_log('Plugin was activated!');
-			// Initialize plugin options
-			//add_option( 'jje_rds_plugin_options', $plugin_options );
+			// Merge options from database with defaults
+			$options = wp_parse_args(get_option($this->optionname), $this->plugin_options);
+			
+			// Update or add options to db
+			update_option( $this->optionname, $options );
 		}
 		
 		/**
@@ -91,14 +94,14 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 		 * @return none
 		 */
 		function jje_rds_menu() {
-			add_options_page( 'Remove Double Space Options', 'Remove Spaces', 'manage_options', 'jje-remove-double-space', array(&$this, 'plugin_options_create_page') );
+			add_options_page( $this->longname, $this->shortname, 'manage_options', $this->hook, array(&$this, 'plugin_options_create_page') );
 		}
 		
 		function plugin_admin_init() {
 			// Initialize plugin options
-			register_setting( 'jje_rds_options_group', 'jje_rds_plugin_options', array(&$this, 'plugin_options_validate') );
-			add_settings_section('jje_rds_plugin_main', '', array(&$this, 'plugin_settings_section'), 'jje-remove-double-space');
-			add_settings_field('remove_all_duplicates', 'Remove all duplicates', array(&$this, 'plugin_setting_rad'), 'jje-remove-double-space', 'jje_rds_plugin_main');
+			register_setting( 'jje_rds_options_group', $this->optionname, array(&$this, 'plugin_options_validate') );
+			add_settings_section('jje_rds_plugin_main', '', array(&$this, 'plugin_settings_section'), $this->hook);
+			add_settings_field('remove_all_duplicates', 'Remove all duplicates', array(&$this, 'plugin_setting_rad'), $this->hook, 'jje_rds_plugin_main');
 		}
 
 		/**
@@ -119,7 +122,7 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 				<h2>Remove Double Space Options</h2>
 				<form method="post" action="options.php">
 					<?php settings_fields('jje_rds_options_group'); ?>
-					<?php do_settings_sections('jje-remove-double-space'); ?>
+					<?php do_settings_sections($this->hook); ?>
 					<p class="submit">
 					<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 					</p>
@@ -128,7 +131,7 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 					<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=JKWPDXGYLASCY"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="Donate here" /></a>
 					</p>
 					<p>For any suggestions, feedback or bugs, please use the support forum or the links below:<br />
-					<a href="http://www.jjeaton.com/blog/remove-double-space-plugin/">Plugin Homepage</a> | <a href="http://www.jjeaton.com/">Author Homepage</a></p>
+					<a href="<?php echo $this->homepage; ?>">Plugin Homepage</a> | <a href="http://www.jjeaton.com/">Author Homepage</a></p>
 				</form>
 			</div>
 		<?php 
@@ -143,31 +146,39 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 		}
 		
 		function plugin_setting_rad() {
-			$options = get_option('jje_rds_plugin_options');
-			echo '<input name="jje_rds_plugin_options[remove_all_duplicates]" type="checkbox" value="1"' . checked($options['remove_all_duplicates'], true, false) . ' />';
-			//. ($options['remove_all_duplicates'] ? ' checked="checked"' : "") . ' />';
+			$options = get_option($this->optionname);
+			echo '<input name="' . $this->optionname . '[remove_all_duplicates]" type="checkbox" value="1"' . checked($options['remove_all_duplicates'], true, false) . ' />';
 		}
 		
 		function plugin_options_validate( $input ) {
+			// merge input array with options saved in the db
+			$options = wp_parse_args($input, get_option( $this->optionname ) );
 
-			error_log('Options before: ' . serialize(get_option( 'jje_rds_plugin_options')));
-			
-			
+			// check if remove_all_duplicates is set, then set to boolean value
 			if (isset($input['remove_all_duplicates']) && $input['remove_all_duplicates'] == '1' ) {
-				error_log('Options set to true!');
 				$options['remove_all_duplicates'] = true;
 			} else {
-				error_log('Options set to false!');
 				$options['remove_all_duplicates'] = false;
-				//$options['remove_all_duplicates'] = 0;
 			}
 			
-			error_log('Options after input: ' . serialize($options));
-			$options = wp_parse_args($options, get_option( 'jje_rds_plugin_options' ) );
-			//$options = wp_parse_args($input, $this->plugin_options );
-			error_log('Options after: ' . serialize($options));
 			return $options;
-			
+		}
+		
+		function plugin_options_url() {
+			return admin_url( 'options-general.php?page='.$this->hook );
+		}
+		
+		/**
+		 * Add a link to the settings page to the plugins list
+		 */
+		function add_settings_link( $links, $file ) {
+			static $this_plugin;
+			if( empty($this_plugin) ) $this_plugin = $this->filename;
+			if ( $file == $this_plugin ) {
+				$settings_link = '<a href="' . $this->plugin_options_url() . '">' . __('Settings') . '</a>';
+				array_unshift( $links, $settings_link );
+			}
+			return $links;
 		}
 		
 		/**
@@ -180,29 +191,32 @@ if ( is_admin() && ( !defined('DOING_AJAX') || !DOING_AJAX ) && !class_exists( '
 		 * @return string The converted text
 		 */
 		function jje_replace_double_space( $text ) {
-			$options = get_option( 'jje_rds_plugin_options' );
+			$options = get_option( $this->optionname );
 			$sanitized_text = $text;
-			
+			error_log('Entering RDS...');
 			// Check if the text is UTF-8
 			// Had a lot of issues trying to match unicode whitespace
 			// See resolution here: http://stackoverflow.com/questions/3137296/matching-duplicate-whitespace-with-preg-replace
 			if ( seems_utf8( $text ) ) {
-				if ( isset( $options['remove_all_duplicates'] ) && $options['remove_all_duplicates'] == 1 ) {
+				if ( isset( $options['remove_all_duplicates'] ) && $options['remove_all_duplicates'] ) {
+					error_log('Removing spaces from text...');
 					$sanitized_text = preg_replace( '/[\p{Z}\s]{2,}/u', ' ', $text );
 				}
 			} else {
-				if ( isset( $options['remove_all_duplicates'] ) && $options['remove_all_duplicates'] == 1 ) {
+				if ( isset( $options['remove_all_duplicates'] ) && $options['remove_all_duplicates'] ) {
 					$sanitized_text = preg_replace( '/\s\s+/', ' ', $sanitized_text );
 				}
 			}
-
+			error_log('Leaving RDS...');
 			return $sanitized_text;
 		} // end jje_replace_double_space()
 
 	} // class JJERemoveDoubleSpace
-} // if !class_exists
-
-// Instantiate RDS class
-$jje_remove_double_space = new JJERemoveDoubleSpace();
+	
+	// Instantiate RDS class
+	$jje_remove_double_space = new JJERemoveDoubleSpace();
+} else { // if !class_exists
+error_log('Class not loaded!!');
+}
 
 ?>
