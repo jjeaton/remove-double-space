@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Remove Double Space
-Version: 0.2
+Version: 0.3
 Plugin URI: http://www.jjeaton.com/blog/remove-double-space-plugin/ 
 Author: Josh Eaton
 Author URI: http://www.jjeaton.com/

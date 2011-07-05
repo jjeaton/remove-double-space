@@ -3,8 +3,8 @@ Contributors: jjeaton
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JKWPDXGYLASCY
 Tags: plugin, posts, Post, formatting, typography, editing, spaces
 Requires at least: 2.9.2
-Tested up to: 3.1.3
-Stable tag: 0.2
+Tested up to: 3.2
+Stable tag: 0.3
 
 Remove duplicate whitespace in between sentences or elsewhere within posts. Useful if multiple contributors use different styles for sentence spacing.
 
@@ -30,6 +30,9 @@ No modifications are made to the post content itself, the replacement happens wh
 Yes, if deleted via the admin interface, the plugin will remove its options from the database using the `uninstall.php` file. Deactivating the plugin won't have any effect on the database options. If this file is not included with the plugin, the uninstall process will not run.
 
 == Changelog ==
+
+= 0.3 =
+* Tested up to 3.2
 
 = 0.2 =
 * Fully uses Settings API
