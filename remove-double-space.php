@@ -2,17 +2,17 @@
 /*
 Plugin Name: Remove Double Space
 Version: 0.3
-Plugin URI: http://www.jjeaton.com/blog/remove-double-space-plugin/ 
+Plugin URI: http://www.josheaton.org/blog/remove-double-space-plugin/
 Author: Josh Eaton
-Author URI: http://www.jjeaton.com/
+Author URI: http://www.josheaton.org/
 Description: Replace duplicate spaces with single spaces in posts.
 License: GPL2
 */
 
-/*  Copyright 2010  Josh Eaton  (email : josh at jjeaton com)
+/*  Copyright 2010-2012  Josh Eaton  (email : josh@josheaton.org)
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License, version 2, as 
+    it under the terms of the GNU General Public License, version 2, as
     published by the Free Software Foundation.
 
     This program is distributed in the hope that it will be useful,
@@ -34,7 +34,7 @@ License: GPL2
  * @param none
  * @return none
  */
- 
+
 if (!class_exists( 'JJERemoveDoubleSpace' )) {
 
 	class JJERemoveDoubleSpace {
@@ -48,7 +48,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		var $plugin_options = array(
 			'remove_all_duplicates' => false
 		);
-		
+
 		/**
 		 * JJERemoveDoubleSpace Constructor
 		 *
@@ -65,7 +65,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 			add_filter( 'plugin_action_links', array(&$this, 'add_settings_link'), 10, 2 );
 			add_filter( 'the_content', array(&$this, 'jje_replace_double_space') ); // Run replacement everywhere 'the_content' is called (posts/feeds/etc.)
 		}
-		
+
 		/**
 		 * Initialize plugin
 		 *
@@ -78,11 +78,11 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		function jje_install_rds() {
 			// Merge options from database with defaults
 			$options = wp_parse_args(get_option($this->optionname), $this->plugin_options);
-			
+
 			// Update or add options to db
 			update_option( $this->optionname, $options );
 		}
-		
+
 		/**
 		 * Adds an options page to the post menu and registers settings
 		 *
@@ -96,7 +96,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 			// Add a sub-menu to the 'Settings' menu
 			add_options_page( $this->longname, $this->shortname, 'manage_options', $this->hook, array(&$this, 'plugin_options_create_page') );
 		}
-		
+
 		function plugin_admin_init() {
 			// Register and configure plugin group, sections and fields
 			register_setting( 'jje_rds_options_group', $this->optionname, array(&$this, 'plugin_options_validate') );
@@ -134,7 +134,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 					<a href="<?php echo $this->homepage; ?>">Plugin Homepage</a> | <a href="http://www.jjeaton.com/">Author Homepage</a></p>
 				</form>
 			</div>
-		<?php 
+		<?php
 		}
 
 		/* Settings API functions
@@ -144,12 +144,12 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		function plugin_settings_section() {
 			echo '<p>Enable the setting below to turn on duplicate space replacement.</p>';
 		}
-		
+
 		function plugin_setting_rad() {
 			$options = get_option($this->optionname);
 			echo '<input name="' . $this->optionname . '[remove_all_duplicates]" type="checkbox" value="1"' . checked($options['remove_all_duplicates'], true, false) . ' />';
 		}
-		
+
 		function plugin_options_validate( $input ) {
 			// Merge input array with options saved in the db
 			$options = wp_parse_args($input, get_option( $this->optionname ) );
@@ -160,14 +160,14 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 			} else {
 				$options['remove_all_duplicates'] = false;
 			}
-			
+
 			return $options;
 		}
-		
+
 		function plugin_options_url() {
 			return admin_url( 'options-general.php?page='.$this->hook );
 		}
-		
+
 		/**
 		 * Add a link to the settings page to the plugins list
 		 */
@@ -180,7 +180,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 			}
 			return $links;
 		}
-		
+
 		/**
 		 * Replaces 2 consecutive spaces with one space.
 		 *
@@ -193,7 +193,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		function jje_replace_double_space( $text ) {
 			$options = get_option( $this->optionname );
 			$sanitized_text = $text;
-			
+
 			// Check if the text is UTF-8
 			// Had a lot of issues trying to match unicode whitespace
 			// See resolution here: http://stackoverflow.com/questions/3137296/matching-duplicate-whitespace-with-preg-replace
@@ -210,7 +210,7 @@ if (!class_exists( 'JJERemoveDoubleSpace' )) {
 		} // end jje_replace_double_space()
 
 	} // class JJERemoveDoubleSpace
-	
+
 	// Instantiate RDS class
 	$jje_remove_double_space = new JJERemoveDoubleSpace();
 } // if !class_exists
