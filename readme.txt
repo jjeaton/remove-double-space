@@ -3,7 +3,7 @@ Contributors: jjeaton
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JKWPDXGYLASCY
 Tags: plugin, posts, Post, formatting, typography, editing, spaces
 Requires at least: 2.9.2
-Tested up to: 3.2
+Tested up to: 3.4.1
 Stable tag: 0.3
 
 Remove duplicate whitespace in between sentences or elsewhere within posts. Useful if multiple contributors use different styles for sentence spacing.
